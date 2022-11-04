@@ -6,6 +6,7 @@ public class Map {
     {
         this.offices = offices;
         this.spots = spots;
+        this.people = new LinkedList<Chel>();
     }
 
     protected ArrayList<Spot> spots;
