@@ -1,10 +1,15 @@
 package StationObjects;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+
+import static java.lang.Thread.sleep;
 
 public class Map {
     public Map(ArrayList<TicketOffice> offices, ArrayList<Spot> spots)
     {
         this.offices = offices;
+        StartAllOffices();//запуск усіх потоків кас
+
         this.spots = spots;
         this.people = new LinkedList<Chel>();
     }
@@ -44,5 +49,30 @@ public class Map {
                 .anyMatch(c->c.id.equals(chel.id));
         if(isChelExist)
             people.remove(chel);
+    }
+
+    public void AddChelToOfficeQueue(TicketOffice office, Chel chel)
+    {
+        synchronized (office)
+        {
+            if(office.getState().toString() != "RUNNABLE")//тут може бути проблема із notify
+            {
+                office.notify();//будимо потік якщо він спить
+            }
+        }
+
+        System.out.println("New Notify of adding chel with id= " + chel.id);
+
+        CompletableFuture.runAsync(()->{
+            office.AddToQueue(chel);
+        });
+
+        System.out.println("Active threads:" + Thread.activeCount());
+    }
+    private void StartAllOffices()
+    {
+        for (var office:offices) {
+            office.start();
+        }
     }
 }
