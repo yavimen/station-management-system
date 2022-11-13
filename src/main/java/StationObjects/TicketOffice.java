@@ -1,5 +1,7 @@
 package StationObjects;
 
+import MoveManaging.IMoveManager;
+
 import java.util.LinkedList;
 
 import static java.lang.Thread.sleep;
@@ -8,10 +10,11 @@ public class TicketOffice extends Thread {
     public TicketOffice() {
         this.queue = new LinkedList<Chel>();
     }
-
-    public TicketOffice(Position position) {
+    protected IMoveManager moveManager;
+    public TicketOffice(Position position, IMoveManager moveManager) {
         this.position = position;
         this.queue = new LinkedList<Chel>();
+        this.moveManager = moveManager;
     }
 
     public Position position;
@@ -20,6 +23,9 @@ public class TicketOffice extends Thread {
 
     private Boolean IsManaging = false;
 
+    public Boolean getIsManaging(){
+        return IsManaging;
+    }
     public LinkedList<Chel> getQueue() {
         return queue;
     }
@@ -27,68 +33,43 @@ public class TicketOffice extends Thread {
     //метод AddToQueue має викликатися асинхронно!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public void AddToQueue(Chel chel) {
 
-        synchronized (queue)
-        {
+        //synchronized (queue)
+        //{
             var isChelExist = queue.stream().anyMatch(c -> c.id.equals(chel.id));
             if (!isChelExist) queue.add(chel);
-        }
-        StartManageChels();
+        //}
+        //StartManageChels();
     }
-
-    //метод перевіряє чи працює основний потік каси (обробляє челів)
-    //якщо працює, то він самостійно опрацює додавання чела і викликати метод опарцювання не треба
-    private void StartManageChels()
-    {
-        if(!IsManaging)
-        {
-            ManageChelsInQueue();
-        }
-    }
-
-    //метод суто для дебагу, може напишу пару тестів
     private void OutputList()
     {
         for (var chel: queue) {
             System.out.println(chel.id + ", " + chel.name);
         }
     }
-    private void ManageChelsInQueue()
-    {
+    @Override
+    public void run() {
         try {
-            IsManaging = true;
-            while(queue.size() > 0)
-            {
-                sleep(1000);//час встановити інший
-                System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
-
-                synchronized (queue) {
-                    queue.removeFirst();
+            while(true){
+                IsManaging = true;
+                while(queue.size() > 0)
+                {
+                    sleep(2000);//час встановити інший
+                    System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
+                    var person = queue.getFirst();
+                    synchronized (queue) {
+                        queue.removeFirst();
+                    }
+                    //видаляю чела з мапи та переміщую всю чергу ближче до каси
+                    moveManager.RemoveChelFromQueue(this, person, new LinkedList<>(queue));
                 }
-
-                OutputList();//потім це видалити
+                synchronized (this) {
+                    wait();
+                }
             }
-            IsManaging = false;
 
-            synchronized (this)
-            {
-                wait();
-            }
         }
         catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void run() {
-        //при запуску каси потік синхронізує власну чергу та стає в режим очікування
-        synchronized (queue) {
-            try {
-                queue.wait();
-            }
-            catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }

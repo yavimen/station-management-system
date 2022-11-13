@@ -1,5 +1,6 @@
 package Logging;
 
 public interface ILogger {
-    public void WriteToFile(String fileName);
+    void WriteToFile(String fileName);
+    ILogger GetInstance();
 }
