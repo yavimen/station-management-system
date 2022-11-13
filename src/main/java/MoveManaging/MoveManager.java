@@ -34,13 +34,13 @@ public class MoveManager implements IMoveManager {
         synchronized (office.getQueue()){
             map.deletePerson(chel);
             Logger.GetInstance().WriteToFile("Remove person "+chel.name+" from Pos "+ chel.targetPosition
-                    +"from queue near ticket office on Pos "+chel.office.position.toString());
+                    +" from queue near ticket office on Pos "+chel.office.position.toString());
             var newPersonPosition = chel.targetPosition;
             var xIncrement = office.position.x.equals(0) ? 1 : -1;
             for (var p: newQueue) {
                 p.position = p.targetPosition;
                 p.targetPosition = new Position(newPersonPosition.x, newPersonPosition.y);
-                Logger.GetInstance().WriteToFile("Move person "+p.name+" from Pos"+p.position+") "
+                Logger.GetInstance().WriteToFile("Move person "+p.name+" from Pos"+p.position+" "
                         +"to Pos "+p.targetPosition);
                 newPersonPosition.x = newPersonPosition.x + xIncrement;
             }
