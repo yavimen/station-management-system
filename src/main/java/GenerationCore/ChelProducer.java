@@ -1,4 +1,7 @@
-package StationObjects;
+package GenerationCore;
+
+import GenerationCore.IChelProducer;
+import StationObjects.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,9 +20,9 @@ public class ChelProducer implements IChelProducer {
 
     public Chel GetChel() {
         var rand = new Random();
-        var statuses = Status.values();
+        var statuses = ChelStatus.values();
         var names = ReadName();
-        var spot = map.spots.get(rand.nextInt(map.getSpots().size()));
+        var spot = map.getSpots().get(rand.nextInt(map.getSpots().size()));
         var possibleStartPositions = FindTheNearestFreePositions(spot.position);
         var startPosition = possibleStartPositions.get(rand.nextInt(possibleStartPositions.size()));
         var mostSuitableOffice = FindTheMostSuitableTicketOffice(startPosition);
@@ -34,7 +37,8 @@ public class ChelProducer implements IChelProducer {
         );
 
         autoIncrementedId++;
-        mostSuitableOffice.AddToQueue(newChel);
+
+        //mostSuitableOffice.AddToQueue(newChel);
 
         return newChel;
     }
@@ -106,7 +110,7 @@ public class ChelProducer implements IChelProducer {
         };
 
         for (var pos : possiblePositions) {
-            if ((pos.x >= 0 && pos.x <= 30) && (pos.y >= 0 && pos.y <= 30) && IsPositionFree(pos))
+            if ((pos.x >= 0 && pos.x < map.mapSize) && (pos.y >= 0 && pos.y < map.mapSize) && IsPositionFree(pos))
                 availablePositions.add(pos);
         }
 
@@ -122,7 +126,7 @@ public class ChelProducer implements IChelProducer {
 
     private boolean IsPositionFree(Position position) {
         for (var person : map.getPeople()) {
-            if (person.position.equals(position))
+            if (person.position.equals(position) && person.isMoved == false)
                 return false;
         }
 
