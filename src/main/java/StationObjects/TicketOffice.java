@@ -30,22 +30,12 @@ public class TicketOffice extends Thread {
         return queue;
     }
 
-    //метод AddToQueue має викликатися асинхронно!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    public void AddToQueue(Chel chel) {
-
-        //synchronized (queue)
-        //{
-            var isChelExist = queue.stream().anyMatch(c -> c.id.equals(chel.id));
-            if (!isChelExist) queue.add(chel);
-        //}
-        //StartManageChels();
-    }
-    private void OutputList()
+    public void AddToQueue(Chel chel)
     {
-        for (var chel: queue) {
-            System.out.println(chel.id + ", " + chel.name);
-        }
+        var isChelExist = queue.stream().anyMatch(c -> c.id.equals(chel.id));
+        if (!isChelExist) queue.add(chel);
     }
+
     @Override
     public void run() {
         try {
@@ -53,13 +43,12 @@ public class TicketOffice extends Thread {
                 IsManaging = true;
                 while(queue.size() > 0)
                 {
-                    sleep(2000);//час встановити інший
+                    sleep(2000);
                     System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
                     var person = queue.getFirst();
                     synchronized (queue) {
                         queue.removeFirst();
                     }
-                    //видаляю чела з мапи та переміщую всю чергу ближче до каси
                     moveManager.RemoveChelFromQueue(this, person, new LinkedList<>(queue));
                 }
                 synchronized (this) {

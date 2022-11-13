@@ -36,7 +36,6 @@ public class Logger{
 
                 writer.close();
             } catch (IOException e) {
-                // Handle it later
                 System.err.println("Error: " + e.getMessage());
             }
         }

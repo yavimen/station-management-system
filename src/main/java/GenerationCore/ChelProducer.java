@@ -38,8 +38,6 @@ public class ChelProducer implements IChelProducer {
 
         autoIncrementedId++;
 
-        //mostSuitableOffice.AddToQueue(newChel);
-
         return newChel;
     }
 

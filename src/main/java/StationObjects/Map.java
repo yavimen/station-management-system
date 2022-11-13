@@ -9,7 +9,7 @@ public class Map {
     public Map(ArrayList<TicketOffice> offices, ArrayList<Spot> spots)
     {
         this.offices = offices;
-        StartAllOffices();//запуск усіх потоків кас
+        StartAllOffices();
 
         this.spots = spots;
         this.people = new LinkedList<Chel>();
@@ -60,17 +60,13 @@ public class Map {
     public void AddChelToOfficeQueue(TicketOffice office, Chel chel)
     {
         office.AddToQueue(chel);
-        //System.out.println("New Notify of adding chel with id= " + chel.id);
-        //синхронізацію переніс у клас MoveManager
         synchronized (office)
         {
-            if(office.getState().toString() != "RUNNABLE")//тут може бути проблема із notify
+            if(office.getState().toString() != "RUNNABLE")
             {
-                office.notify();//будимо потік якщо він спить
+                office.notify();
             }
         }
-
-        //System.out.println("Active threads:" + Thread.activeCount());
     }
     public void StartAllOffices()
     {
@@ -79,7 +75,6 @@ public class Map {
         }
     }
 
-    //для перевірки чи позиція зайнята на мапі
     public Boolean IsFreePosition(Position position){
         var boolList = new LinkedList<Boolean>();
 
