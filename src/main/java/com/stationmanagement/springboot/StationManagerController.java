@@ -15,20 +15,20 @@ public class StationManagerController
     public MapConfig ConfigureMap(@RequestBody MapConfig config)
     {
         stationSimulator = new StationSimulator(config);
-        stationSimulator.StartSimulation();
+        stationSimulator.startSimulation();
         return config;
     }
 
     @GetMapping
     public MapView GetCurrentMap()
     {
-        return stationSimulator.GetMapView();
+        return stationSimulator.getMapView();
     }
 
     @PostMapping(path = "turnOffStationSimulator")
     public void TurnOffStationSimulator()
     {
-        stationSimulator.DisposeAllThreads();
+        stationSimulator.disposeAllThreads();
         stationSimulator = null;
     }
 }

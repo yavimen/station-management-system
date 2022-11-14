@@ -28,7 +28,7 @@ public class ChelProducer implements IChelProducer {
         var mostSuitableOffice = FindTheMostSuitableTicketOffice(startPosition);
 
                 var newChel = new Chel(autoIncrementedId,
-                rand.nextInt(3),
+                getRandomPersonStatus().ordinal(),
                 rand.nextInt(5) + 1,
                 names[rand.nextInt(names.length)],
                 mostSuitableOffice,
@@ -39,6 +39,18 @@ public class ChelProducer implements IChelProducer {
         autoIncrementedId++;
 
         return newChel;
+    }
+
+    private ChelStatus getRandomPersonStatus(){
+        Random random = new Random();
+        var value = random.nextInt(100);
+        if(value < 70){
+            return ChelStatus.Usual;
+        }
+        else if(value < 90){
+            return ChelStatus.OldBoy;
+        }
+        return ChelStatus.Disabled;
     }
 
     private String[] ReadName() {

@@ -1,16 +1,16 @@
 package StationObjects;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import MoveManaging.IMoveManager;
 
-import static java.lang.Thread.sleep;
+import java.util.*;
 
 public class Map {
     public final int mapSize = 15;
+
+    public IMoveManager moveManager;
+
     public Map(ArrayList<TicketOffice> offices, ArrayList<Spot> spots)
     {
         this.offices = offices;
-        StartAllOffices();
-
         this.spots = spots;
         this.people = new LinkedList<Chel>();
     }
@@ -18,6 +18,7 @@ public class Map {
     public Map(){
         this.people = new LinkedList<Chel>();
     }
+    
     protected ArrayList<Spot> spots;
 
     public ArrayList<Spot> getSpots()
@@ -57,25 +58,7 @@ public class Map {
             people.remove(chel);
     }
 
-    public void AddChelToOfficeQueue(TicketOffice office, Chel chel)
-    {
-        office.AddToQueue(chel);
-        synchronized (office)
-        {
-            if(office.getState().toString() != "RUNNABLE")
-            {
-                office.notify();
-            }
-        }
-    }
-    public void StartAllOffices()
-    {
-        for (var office:offices) {
-            office.start();
-        }
-    }
-
-    public Boolean IsFreePosition(Position position){
+    public Boolean isFreePosition(Position position){
         var boolList = new LinkedList<Boolean>();
 
         boolList.add(

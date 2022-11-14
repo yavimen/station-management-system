@@ -1,8 +1,6 @@
 package GenerationCore;
 
-import Logging.Logger;
 import MoveManaging.IMoveManager;
-import MoveManaging.MoveManager;
 import StationObjects.Chel;
 import StationObjects.Map;
 
@@ -29,7 +27,7 @@ public class ChelGenerator extends Thread {
                 }
                 else {
                     Chel newChel = producer.GetChel();
-                    manager.PutChelInQueue(newChel.office ,newChel);
+                    manager.putChelInQueue(newChel.office ,newChel);
                 }
             }
             else{
@@ -37,7 +35,7 @@ public class ChelGenerator extends Thread {
                     isMaxChelLimit = false;
             }
             try{
-            Thread.sleep(500);
+            Thread.sleep(1000);
             }catch (Exception ex){
                 System.out.println(ex.getMessage());
             }

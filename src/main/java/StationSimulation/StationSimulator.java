@@ -15,27 +15,28 @@ public class StationSimulator implements IStationSimulator {
     protected Map map;
     protected ChelGenerator generator;
     public StationSimulator(){
-        map = MapConfigurator.GenerateTestMap1();
+        map = MapConfigurator.generateTestMap2();
         moveManager = MapConfigurator.getMoveManager();
         IChelProducer producer = new ChelProducer(map);
         generator = new ChelGenerator(true, map, producer, moveManager);
     }
     public StationSimulator(MapConfig config){
-        map = MapConfigurator.CreateMap(config);
+        map = MapConfigurator.createMap(config);
         moveManager = MapConfigurator.getMoveManager();
         IChelProducer producer = new ChelProducer(map);
         generator = new ChelGenerator(true, map, producer, moveManager);
     }
 
-     public MapView GetMapView() {
+    public MapView getMapView() {
          return new MapView(map);
      }
-    public void StartSimulation(){
-        map.StartAllOffices();
+
+    public void startSimulation(){
+        map.getOffices().forEach(o->o.start());
         generator.start();
     }
 
-    public void DisposeAllThreads(){
+    public void disposeAllThreads(){
         generator.interrupt();
         map.getOffices().forEach(o->o.interrupt());
     }
