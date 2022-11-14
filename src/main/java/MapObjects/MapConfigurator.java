@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class MapConfigurator {
     public static IMoveManager moveManager;
-    public static Map GenerateTestMap1(){
+    public static Map generateTestMap1(){
         ArrayList<TicketOffice> offices = new ArrayList<>();
         var map = new Map();
         moveManager = new MoveManager(map);
@@ -20,8 +20,19 @@ public class MapConfigurator {
         map.setSpots(entrances);
         return map;
     }
+    public static Map generateTestMap2(){
+        ArrayList<TicketOffice> offices = new ArrayList<>();
+        var map = new Map();
+        moveManager = new MoveManager(map);
+        offices.add(new TicketOffice(new Position(0, 6), moveManager));
+        ArrayList<Spot> entrances = new ArrayList<>();
+        entrances.add(new Spot(new Position(7,0)));
+        map.setOffices(offices);
+        map.setSpots(entrances);
+        return map;
+    }
 
-    public static Map CreateMap(MapConfig config){
+    public static Map createMap(MapConfig config){
 
         ArrayList<TicketOffice> offices = new ArrayList<>();
         var map = new Map();

@@ -12,31 +12,41 @@ public class MoveManager implements IMoveManager {
 
     // використовує 1 потік
     // для використання потоком, що створює челів
+    /*
+        дивиться чи чел має особливий статус чи ні, відповідно додає після людини, що вже обслуговується
+        у касі або ставить у кінець черги
+     */
     @Override
-    public void PutChelInQueue(TicketOffice office, Chel chel) {
+    public void putChelInQueue(TicketOffice office, Chel chel) {
         synchronized (office.getQueue()) {
-            chel.targetPosition = FindTargetPosition(office);
             chel.isMoved = true;
-            map.addPerson(chel);
-
-            map.AddChelToOfficeQueue(office, chel);
+            if(chel.chelStatus.equals(ChelStatus.Usual) || office.getQueue().size() <= 1) {
+                chel.targetPosition = findTargetPosition(office);
+                map.addPerson(chel);
+                office.addAtTheEndOfQueue(chel);
+            }
+            else{
+                chel.targetPosition = getPositionForNewDisabledPersonNearOffice(office);
+                map.addPerson(chel);
+                office.addChelToQueueAtPosition(moveQueueForDisabledPersonAndFindInsertingIndex(office), chel);
+            }
         }
-        Logger.GetInstance().WriteToFile("Create person "+chel.name+" on Pos("+chel.position.x+", "+chel.position.y+") "
-            +"targetPos("+chel.targetPosition.x+", "+chel.targetPosition.y+")");
-
+        Logger.GetInstance().WriteToFile("Create "+chel.chelStatus+" person "+chel.name+" on Pos("+chel.position.x+", "+chel.position.y+") "
+                +"targetPos("+chel.targetPosition.x+", "+chel.targetPosition.y+")");
     }
 
     // використовують багато потоків
     // викликають каси, при обробці чела в черзі, щоб коректно видалити його з мапи і посунути чергу
     // бажано запускати асинхронно з синхронізацією на мапі перед обрахуноком позиції
     @Override
-    public void RemoveChelFromQueue(TicketOffice office ,Chel chel, LinkedList<Chel> newQueue) {
+    public void removeChelFromQueue(TicketOffice office , Chel chel, LinkedList<Chel> newQueue) {
         synchronized (office.getQueue()){
             map.deletePerson(chel);
             Logger.GetInstance().WriteToFile("Remove person "+chel.name+" from Pos "+ chel.targetPosition
                     +" from queue near ticket office on Pos "+chel.office.position.toString());
             var newPersonPosition = chel.targetPosition;
             var xIncrement = office.position.x.equals(0) ? 1 : -1;
+            Logger.GetInstance().WriteToFile("Move queue near "+office.position+" because "+chel.name+" left.");
             for (var p: newQueue) {
                 p.position = p.targetPosition;
                 p.targetPosition = new Position(newPersonPosition.x, newPersonPosition.y);
@@ -47,15 +57,44 @@ public class MoveManager implements IMoveManager {
         }
     }
 
+    public int moveQueueForDisabledPersonAndFindInsertingIndex(TicketOffice office){
+        var xIncrement = office.position.x.equals(0) ? 1 : -1;
+        var queue = office.getQueue();
+        Logger.GetInstance().WriteToFile("Moving the queue near "+office.position+
+                " because came person with special status.");
+        for(int i = queue.size() - 1; i > 1; --i){
+            var p = queue.get(i);
+            if(!p.chelStatus.equals(ChelStatus.Usual)){
+                return i + 1;
+            }
+            p.position = p.targetPosition;
+            p.targetPosition = new Position(p.targetPosition.x + xIncrement, p.targetPosition.y);
+            Logger.GetInstance().WriteToFile("Move person "+p.name+" from Pos"+p.position+" "
+                    +"to Pos "+p.targetPosition+".");
+        }
+        return 1;
+    }
+
+    public Position getPositionForNewDisabledPersonNearOffice(TicketOffice office){
+        var xIncrement = office.position.x.equals(0) ? 1 : -1;
+        var queue = office.getQueue();
+        for(int i = queue.size() - 1; i > 1; --i){
+            var p = queue.get(i);
+            if(!p.chelStatus.equals(ChelStatus.Usual)){
+                return new Position(p.targetPosition.x + xIncrement, p.targetPosition.y);
+            }
+        }
+        return new Position(office.position.x + 2 * xIncrement, office.position.y);
+    }
+
     //метод для знаходження коректної позиції біля каси
-    public Position FindTargetPosition(TicketOffice office){
-        Integer xIncrement = 0;
-        xIncrement = office.position.x.equals(0) ? 1 : -1;
+    public Position findTargetPosition(TicketOffice office){
+        int xIncrement = office.position.x.equals(0) ? 1 : -1;
 
         var startPosition = new Position(office.position.x + xIncrement, office.position.y);
 
         while(!startPosition.x.equals((map.mapSize - 1) / 2)){
-            if(map.IsFreePosition(startPosition).equals(true)){
+            if(map.isFreePosition(startPosition).equals(true)){
                 return startPosition;
             }
             startPosition.x+=xIncrement;

@@ -4,12 +4,7 @@ import MoveManaging.IMoveManager;
 
 import java.util.LinkedList;
 
-import static java.lang.Thread.sleep;
-
 public class TicketOffice extends Thread {
-    public TicketOffice() {
-        this.queue = new LinkedList<Chel>();
-    }
     protected IMoveManager moveManager;
     public TicketOffice(Position position, IMoveManager moveManager) {
         this.position = position;
@@ -21,35 +16,55 @@ public class TicketOffice extends Thread {
 
     private LinkedList<Chel> queue;
 
-    private Boolean IsManaging = false;
+    private Boolean isManaging = false;
 
     public Boolean getIsManaging(){
-        return IsManaging;
+        return isManaging;
     }
     public LinkedList<Chel> getQueue() {
         return queue;
     }
 
-    public void AddToQueue(Chel chel)
+    public void addAtTheEndOfQueue(Chel chel)
     {
         var isChelExist = queue.stream().anyMatch(c -> c.id.equals(chel.id));
         if (!isChelExist) queue.add(chel);
+
+        synchronized (this)
+        {
+            if(getState().toString() != "RUNNABLE")
+            {
+                notify();
+            }
+        }
     }
 
+    public void addChelToQueueAtPosition(int index , Chel chel){
+        var isChelExist = queue.stream().anyMatch(c -> c.id.equals(chel.id));
+        if (!isChelExist) queue.add(index, chel);
+
+        synchronized (this)
+        {
+            if(getState().toString() != "RUNNABLE")
+            {
+                notify();
+            }
+        }
+    }
     @Override
     public void run() {
         try {
             while(true){
-                IsManaging = true;
+                isManaging = true;
                 while(queue.size() > 0)
                 {
-                    sleep(2000);
+                    sleep(5000);
                     System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
                     var person = queue.getFirst();
                     synchronized (queue) {
                         queue.removeFirst();
                     }
-                    moveManager.RemoveChelFromQueue(this, person, new LinkedList<>(queue));
+                    moveManager.removeChelFromQueue(this, person, new LinkedList<>(queue));
                 }
                 synchronized (this) {
                     wait();
@@ -58,7 +73,7 @@ public class TicketOffice extends Thread {
 
         }
         catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            System.out.println("Ticket office "+this.position+" closed.");
         }
     }
 }
