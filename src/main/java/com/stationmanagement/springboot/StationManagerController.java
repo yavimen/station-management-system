@@ -6,6 +6,7 @@ import StationSimulation.StationSimulator;
 import Views.MapView;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping(path = "api/v1/stationmanager")
 public class StationManagerController
