@@ -24,7 +24,7 @@ public class StationSimulator implements IStationSimulator {
         map = MapConfigurator.createMap(config);
         moveManager = MapConfigurator.getMoveManager();
         IChelProducer producer = new ChelProducer(map);
-        generator = new ChelGenerator(true, map, producer, moveManager);
+        generator = new ChelGenerator(config.isRandomSpawnTime, map, producer, moveManager);
     }
 
     public MapView getMapView() {
@@ -33,11 +33,13 @@ public class StationSimulator implements IStationSimulator {
 
     public void startSimulation(){
         map.getOffices().forEach(o->o.start());
+        map.reserveTicketOffice.start();
         generator.start();
     }
 
     public void disposeAllThreads(){
         generator.interrupt();
+        map.reserveTicketOffice.interrupt();
         map.getOffices().forEach(o->o.interrupt());
     }
 }

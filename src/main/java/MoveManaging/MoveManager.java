@@ -5,6 +5,7 @@ import StationObjects.*;
 import java.util.LinkedList;
 
 public class MoveManager implements IMoveManager {
+
     protected Map map;
     public MoveManager(Map map){
         this.map = map;
