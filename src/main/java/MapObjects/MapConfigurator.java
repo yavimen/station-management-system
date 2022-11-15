@@ -18,6 +18,7 @@ public class MapConfigurator {
         entrances.add(new Spot(new Position(7,14)));
         map.setOffices(offices);
         map.setSpots(entrances);
+        map.reserveTicketOffice = new TicketOffice(new Position(0, 8), moveManager);
         return map;
     }
     public static Map generateTestMap2(){
@@ -29,6 +30,7 @@ public class MapConfigurator {
         entrances.add(new Spot(new Position(7,0)));
         map.setOffices(offices);
         map.setSpots(entrances);
+        map.reserveTicketOffice = new TicketOffice(new Position(0, 8), moveManager);
         return map;
     }
 
@@ -38,7 +40,7 @@ public class MapConfigurator {
         var map = new Map();
         moveManager = new MoveManager(map);
         for (var office: config.ticketOffices) {
-         offices.add(new TicketOffice(office, moveManager));
+         offices.add(new TicketOffice(office, moveManager, config.processingTime));
         }
         ArrayList<Spot> entrances = new ArrayList<>();
         for (var entrance: config.entrances) {
@@ -46,6 +48,7 @@ public class MapConfigurator {
         }
         map.setOffices(offices);
         map.setSpots(entrances);
+        map.reserveTicketOffice = new TicketOffice(config.reservedTicketOffice, moveManager, config.processingTime);
         return map;
     }
 

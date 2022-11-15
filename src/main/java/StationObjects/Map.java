@@ -6,7 +6,7 @@ import java.util.*;
 public class Map {
     public final int mapSize = 15;
 
-    public IMoveManager moveManager;
+    public TicketOffice reserveTicketOffice;
 
     public Map(ArrayList<TicketOffice> offices, ArrayList<Spot> spots)
     {

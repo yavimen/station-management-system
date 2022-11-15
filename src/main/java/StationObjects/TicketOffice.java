@@ -6,24 +6,35 @@ import java.util.LinkedList;
 
 public class TicketOffice extends Thread {
     protected IMoveManager moveManager;
+    public Position position;
+
+    private LinkedList<Chel> queue;
+    public LinkedList<Chel> getQueue() {
+        return queue;
+    }
+
+    private Boolean isManaging = false;
+    public Boolean getIsManaging(){
+        return isManaging;
+    }
+
+    //у секундах
+    private Integer processingTime;
+
     public TicketOffice(Position position, IMoveManager moveManager) {
+        this.processingTime = 1;
         this.position = position;
         this.queue = new LinkedList<Chel>();
         this.moveManager = moveManager;
     }
 
-    public Position position;
-
-    private LinkedList<Chel> queue;
-
-    private Boolean isManaging = false;
-
-    public Boolean getIsManaging(){
-        return isManaging;
+    public TicketOffice(Position position, IMoveManager moveManager, Integer processingTime) {
+        this.position = position;
+        this.queue = new LinkedList<Chel>();
+        this.moveManager = moveManager;
+        this.processingTime = processingTime;
     }
-    public LinkedList<Chel> getQueue() {
-        return queue;
-    }
+
 
     public void addAtTheEndOfQueue(Chel chel)
     {
@@ -58,9 +69,9 @@ public class TicketOffice extends Thread {
                 isManaging = true;
                 while(queue.size() > 0)
                 {
-                    sleep(5000);
-                    System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
                     var person = queue.getFirst();
+                    sleep(person.quantity * processingTime*1000);
+                    System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
                     synchronized (queue) {
                         queue.removeFirst();
                     }
