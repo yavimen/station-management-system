@@ -57,6 +57,15 @@ public class MoveManager implements IMoveManager {
             }
         }
     }
+    @Override
+    public void removeChelFromDisabledQueue(TicketOffice reserveOffice , Chel chel, LinkedList<Chel> newQueue)
+    {
+        synchronized (reserveOffice.getQueue()){
+            Logger.GetInstance().WriteToFile("Remove person "+chel.name+" from Pos "+ chel.targetPosition
+                    +" from disabled queue near ticket office on Pos "+chel.office.position.toString());
+            chel.position = chel.targetPosition;
+        }
+    }
 
     public int moveQueueForDisabledPersonAndFindInsertingIndex(TicketOffice office){
         var xIncrement = office.position.x.equals(0) ? 1 : -1;
