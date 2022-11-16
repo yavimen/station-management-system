@@ -82,14 +82,17 @@ public class TicketOffice extends Thread {
 
             result = true;
             isManaging = false;
-
+            try{
             synchronized (queue)
             {
                 for (var chel: queue) {
                     moveManager.removeChelFromDisabledQueue(this, chel, new LinkedList<>(queue));
-                    moveManager.putChelInQueue(reserveTicketOffice, chel);
                     chel.office = reserveTicketOffice;
+                    moveManager.putChelInQueue(reserveTicketOffice, chel);
                 }
+            }
+            }catch (Exception ex){
+                Logger.GetInstance().WriteToFile(ex.getMessage());
             }
         }
         return result;
@@ -101,7 +104,7 @@ public class TicketOffice extends Thread {
                 while(queue.size() > 0)
                 {
                     var person = queue.getFirst();
-                    sleep(person.quantity * processingTime*1000);
+                    sleep(person.quantity * processingTime * 1000);
                     System.out.println("String " + queue.getFirst() + " removed!, number: " + queue.size());
                     synchronized (queue) {
                         queue.removeFirst();

@@ -9,6 +9,5 @@ public class MapConfig {
     public ArrayList<Position> ticketOffices;
     public Integer processingTime;
     public Boolean isRandomSpawnTime;
-
     public Position reservedTicketOffice;
 }
