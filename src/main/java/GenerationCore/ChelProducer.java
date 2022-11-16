@@ -8,10 +8,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class ChelProducer implements IChelProducer {
     protected Map map;
-
     private int autoIncrementedId = 0;
 
     public ChelProducer(Map map) {
@@ -68,31 +68,34 @@ public class ChelProducer implements IChelProducer {
     }
 
     private TicketOffice FindTheMostSuitableTicketOffice(Position position) {
-        var mostSuitableOffice = map.getOffices().get(0);
-        var shortestQueueSize = map.getOffices().get(0).getQueue().size();
+
+        //EnabledOffices - всі каси, які можуть приймати клієнтів (не вимкнені) і не є резервними
+        var EnabledOffices = map.getOffices().stream().filter(o->o.getIsManaging() == true && o.getIsReserve() == false).collect(Collectors.toList());
+        var mostSuitableOffice = EnabledOffices.get(0);
+        var shortestQueueSize = EnabledOffices.get(0).getQueue().size();
         var counter = 0;
 
-        for (var office : map.getOffices()) {
+        for (var office : EnabledOffices) {
             if (office.getQueue().size() < shortestQueueSize)
             {
                 shortestQueueSize = office.getQueue().size();
                 mostSuitableOffice = office;
             }
-            if (office.getQueue().size() == map.getOffices().get(0).getQueue().size())
+            if (office.getQueue().size() == EnabledOffices.get(0).getQueue().size())
                 counter++;
         }
 
-        if (map.getOffices().size() == counter)
-            mostSuitableOffice = FindTheNearestTicketOffice(position);
+        if (EnabledOffices.size() == counter)
+            mostSuitableOffice = FindTheNearestTicketOffice(position, EnabledOffices);
 
         return mostSuitableOffice;
     }
 
-    private TicketOffice FindTheNearestTicketOffice(Position position) {
-        var nearestOffice = map.getOffices().get(0);
+    private TicketOffice FindTheNearestTicketOffice(Position position, List<TicketOffice> EnabledOffices) {
+        var nearestOffice = EnabledOffices.get(0);
         var shortestDistance = FindDistance(position, nearestOffice.position);
 
-        for (var office : map.getOffices()) {
+        for (var office : EnabledOffices) {
             var dist = FindDistance(position, office.position);
             if (dist < shortestDistance) {
                 shortestDistance = dist;

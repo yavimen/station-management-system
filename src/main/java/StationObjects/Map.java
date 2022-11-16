@@ -14,7 +14,13 @@ public class Map {
         this.spots = spots;
         this.people = new LinkedList<Chel>();
     }
-
+    public void setReserveOffice(TicketOffice reserveOffice)
+    {
+        this.reserveTicketOffice = reserveOffice;
+        for (var office: offices) {
+            office.setReserveTicketOffice(reserveTicketOffice);
+        }
+    }
     public Map(){
         this.people = new LinkedList<Chel>();
     }

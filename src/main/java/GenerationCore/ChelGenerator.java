@@ -5,6 +5,7 @@ import StationObjects.Chel;
 import StationObjects.Map;
 
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class ChelGenerator extends Thread {
     protected Map map;
@@ -24,6 +25,8 @@ public class ChelGenerator extends Thread {
         boolean isMaxChelLimit = false;
         try{
             while(true){
+                //визначає ліміт за кількістю активних кас, хз чи взагалі треба це
+                maxChelLimit = (map.mapSize - 2) / 2 * map.getOffices().stream().filter(o->o.getIsManaging() == true).collect(Collectors.toList()).size();
                 if(!isMaxChelLimit) {
                     if (maxChelLimit <= map.getPeople().size()) {
                         isMaxChelLimit = true;
