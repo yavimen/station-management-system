@@ -70,7 +70,7 @@ public class ChelProducer implements IChelProducer {
     private TicketOffice FindTheMostSuitableTicketOffice(Position position) {
 
         //EnabledOffices - всі каси, які можуть приймати клієнтів (не вимкнені) і не є резервними
-        var EnabledOffices = map.getOffices().stream().filter(o->o.getIsManaging() == true && o.getIsReserve() == false).collect(Collectors.toList());
+        var EnabledOffices = map.getOffices().stream().filter(o->o.getIsManaging() == true && o.getIsReserve() == false).toList();
         var mostSuitableOffice = EnabledOffices.get(0);
         var shortestQueueSize = EnabledOffices.get(0).getQueue().size();
         var counter = 0;

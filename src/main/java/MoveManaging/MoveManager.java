@@ -61,7 +61,7 @@ public class MoveManager implements IMoveManager {
     public void removeChelFromDisabledQueue(TicketOffice reserveOffice , Chel chel, LinkedList<Chel> newQueue)
     {
         synchronized (reserveOffice.getQueue()){
-            Logger.GetInstance().WriteToFile("Remove person "+chel.name+" from Pos "+ chel.targetPosition
+            Logger.GetInstance().WriteToFile("Remove person "+chel.name+" "+chel.id+" from Pos "+ chel.targetPosition
                     +" from disabled queue near ticket office on Pos "+chel.office.position.toString());
             chel.position = chel.targetPosition;
         }
@@ -72,7 +72,7 @@ public class MoveManager implements IMoveManager {
         var queue = office.getQueue();
         Logger.GetInstance().WriteToFile("Moving the queue near "+office.position+
                 " because came person with special status.");
-        for(int i = queue.size() - 1; i > 1; --i){
+        for(int i = queue.size() - 1; i > 0 ; --i){
             var p = queue.get(i);
             if(!p.chelStatus.equals(ChelStatus.Usual)){
                 return i + 1;
@@ -88,7 +88,7 @@ public class MoveManager implements IMoveManager {
     public Position getPositionForNewDisabledPersonNearOffice(TicketOffice office){
         var xIncrement = office.position.x.equals(0) ? 1 : -1;
         var queue = office.getQueue();
-        for(int i = queue.size() - 1; i > 1; --i){
+        for(int i = queue.size() - 1; i > 0; --i){
             var p = queue.get(i);
             if(!p.chelStatus.equals(ChelStatus.Usual)){
                 return new Position(p.targetPosition.x + xIncrement, p.targetPosition.y);

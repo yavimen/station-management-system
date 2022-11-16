@@ -21,12 +21,13 @@ public class ChelGenerator extends Thread {
 
     @Override
     public void run() {
-        var maxChelLimit = (map.mapSize - 2) / 2 * map.getOffices().size();
         boolean isMaxChelLimit = false;
+        var maxChelLimit = (map.mapSize - 2) / 2 * map.getOffices().size();
         try{
             while(true){
                 //визначає ліміт за кількістю активних кас, хз чи взагалі треба це
-                maxChelLimit = (map.mapSize - 2) / 2 * map.getOffices().stream().filter(o->o.getIsManaging() == true).collect(Collectors.toList()).size();
+                maxChelLimit = (map.mapSize - 2) / 2 * map.getOffices().stream()
+                        .filter(o->o.getIsManaging() == true).toList().size();
                 if(!isMaxChelLimit) {
                     if (maxChelLimit <= map.getPeople().size()) {
                         isMaxChelLimit = true;
@@ -50,7 +51,7 @@ public class ChelGenerator extends Thread {
 
     protected Integer GetSleepTime(){
         if(!isRandomSpawnTime){
-            return 500;
+            return 1000;
         }
         Random random = new Random();
 
