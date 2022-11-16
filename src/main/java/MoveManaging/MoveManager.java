@@ -26,14 +26,19 @@ public class MoveManager implements IMoveManager {
                 map.addPerson(chel);
                 office.addAtTheEndOfQueue(chel);
             }
-            else{
+            else if(chel.chelStatus.equals(ChelStatus.Disabled)){
                 chel.targetPosition = getPositionForNewDisabledPersonNearOffice(office);
                 map.addPerson(chel);
                 office.addChelToQueueAtPosition(moveQueueForDisabledPersonAndFindInsertingIndex(office), chel);
             }
+            else{
+                chel.targetPosition = getPositionForNewOldBoyPersonNearOffice(office);
+                map.addPerson(chel);
+                office.addChelToQueueAtPosition(moveQueueForOldBoyPersonAndFindInsertingIndex(office), chel);
+            }
         }
         Logger.GetInstance().WriteToFile("Create "+chel.chelStatus+" person "+chel.name+" on Pos("+chel.position.x+", "+chel.position.y+") "
-                +"targetPos("+chel.targetPosition.x+", "+chel.targetPosition.y+")");
+                +"targetPos("+chel.targetPosition.x+", "+chel.targetPosition.y+")" + "target ticket office "+chel.office.position);
     }
 
     // використовують багато потоків
@@ -76,6 +81,24 @@ public class MoveManager implements IMoveManager {
                 " because came person with special status.");
         for(int i = queue.size() - 1; i > 0 ; --i){
             var p = queue.get(i);
+            if(p.chelStatus.equals(ChelStatus.Disabled)){
+                return i + 1;
+            }
+            p.position = p.targetPosition;
+            p.targetPosition = new Position(p.targetPosition.x + xIncrement, p.targetPosition.y);
+            Logger.GetInstance().WriteToFile("Move person "+p.name+" from Pos"+p.position+" "
+                    +"to Pos "+p.targetPosition+".");
+        }
+        return 1;
+    }
+
+    public int moveQueueForOldBoyPersonAndFindInsertingIndex(TicketOffice office){
+        var xIncrement = office.position.x.equals(0) ? 1 : -1;
+        var queue = office.getQueue();
+        Logger.GetInstance().WriteToFile("Moving the queue near "+office.position+
+                " because came person with special status.");
+        for(int i = queue.size() - 1; i > 0 ; --i){
+            var p = queue.get(i);
             if(!p.chelStatus.equals(ChelStatus.Usual)){
                 return i + 1;
             }
@@ -88,6 +111,17 @@ public class MoveManager implements IMoveManager {
     }
 
     public Position getPositionForNewDisabledPersonNearOffice(TicketOffice office){
+        var xIncrement = office.position.x.equals(0) ? 1 : -1;
+        var queue = office.getQueue();
+        for(int i = queue.size() - 1; i > 0; --i){
+            var p = queue.get(i);
+            if(p.chelStatus.equals(ChelStatus.Disabled)){
+                return new Position(p.targetPosition.x + xIncrement, p.targetPosition.y);
+            }
+        }
+        return new Position(office.position.x + 2 * xIncrement, office.position.y);
+    }
+    public Position getPositionForNewOldBoyPersonNearOffice(TicketOffice office){
         var xIncrement = office.position.x.equals(0) ? 1 : -1;
         var queue = office.getQueue();
         for(int i = queue.size() - 1; i > 0; --i){

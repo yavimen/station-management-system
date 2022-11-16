@@ -5,7 +5,6 @@ import StationObjects.Chel;
 import StationObjects.Map;
 
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class ChelGenerator extends Thread {
     protected Map map;
