@@ -10,7 +10,7 @@ import java.util.Random;
 public class TicketOffice extends Thread {
     protected IMoveManager moveManager;
     public Position position;
-
+    protected static Boolean canDisable = true;
     private TicketOffice reserveTicketOffice;
 
     public void setReserveTicketOffice(TicketOffice value){ reserveTicketOffice = value; }
@@ -73,26 +73,37 @@ public class TicketOffice extends Thread {
 
     private Boolean DisableStation()
     {
+        if(isReserve == true)
+            return false;
         Boolean result = false;
         Random randGenerator = new Random(LocalDateTime.now().getNano());
-
-        if(randGenerator.nextInt(200) < servedChelsNumber && !isReserve)
-        {
-            Logger.GetInstance().WriteToFile("Station " + this.position.toString() + " disabled!\n");
-
-            result = true;
-            isManaging = false;
-            try{
-            synchronized (queue)
+        synchronized (canDisable){
+            if(!canDisable || reserveTicketOffice.getQueue().size() != 0)
             {
-                for (var chel: queue) {
-                    moveManager.removeChelFromDisabledQueue(this, chel, new LinkedList<>(queue));
-                    chel.office = reserveTicketOffice;
-                    moveManager.putChelInQueue(reserveTicketOffice, chel);
-                }
+                servedChelsNumber = 0;
+                return result;
             }
-            }catch (Exception ex){
-                Logger.GetInstance().WriteToFile(ex.getMessage());
+            if(randGenerator.nextInt(1) + 6 < servedChelsNumber && !isReserve)
+            {
+                    canDisable = false;
+                    Logger.GetInstance().WriteToFile("Station " + this.position.toString() + " disabled!\n");
+
+                    result = true;
+                    isManaging = false;
+
+                try{
+                synchronized (queue)
+                {
+                    // (var chel: queue) {
+                        moveManager.removeChelFromDisabledQueue(reserveTicketOffice, new LinkedList<>(queue));
+                        queue.clear();
+                    //    chel.office = reserveTicketOffice;
+                    //    moveManager.putChelInQueue(reserveTicketOffice, chel);
+                    //}
+                }
+                }catch (Exception ex){
+                    Logger.GetInstance().WriteToFile(ex.getMessage());
+                }
             }
         }
         return result;
@@ -113,16 +124,19 @@ public class TicketOffice extends Thread {
                     servedChelsNumber++;
 
                     if(DisableStation()) {
+                        System.out.println("Каса зламалася" + position);
                         break;
                     }
                 }
                 synchronized (this) {
-
                     if(!isManaging)
                     {
                         wait(10000); //чекаємо 10 секунд поки відновиться робота каси
                         Logger.GetInstance().WriteToFile("Station " + this.position.toString() + " enabled!\n");
+                        System.out.println("Каса відновилася" + position);
                         isManaging = true;
+                        servedChelsNumber = 0;
+                        canDisable = true;
                     }
                     wait(); //каса очікує
                 }
