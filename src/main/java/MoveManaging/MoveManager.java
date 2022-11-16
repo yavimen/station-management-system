@@ -58,12 +58,14 @@ public class MoveManager implements IMoveManager {
         }
     }
     @Override
-    public void removeChelFromDisabledQueue(TicketOffice reserveOffice , Chel chel, LinkedList<Chel> newQueue)
+    public void removeChelFromDisabledQueue(TicketOffice reserveOffice, LinkedList<Chel> newQueue)
     {
         synchronized (reserveOffice.getQueue()){
-            Logger.GetInstance().WriteToFile("Remove person "+chel.name+" "+chel.id+" from Pos "+ chel.targetPosition
-                    +" from disabled queue near ticket office on Pos "+chel.office.position.toString());
-            chel.position = chel.targetPosition;
+            for(var item: newQueue){
+                item.position = item.targetPosition;
+                item.office= reserveOffice;
+                putChelInQueue(reserveOffice ,item);
+            }
         }
     }
 

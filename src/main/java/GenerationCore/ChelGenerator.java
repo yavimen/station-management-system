@@ -34,7 +34,8 @@ public class ChelGenerator extends Thread {
                     }
                     else {
                         Chel newChel = producer.GetChel();
-                        manager.putChelInQueue(newChel.office ,newChel);
+                        if(newChel.office.getQueue().size() < 6)
+                            manager.putChelInQueue(newChel.office ,newChel);
                     }
                 }
                 else{

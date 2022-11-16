@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class ChelProducer implements IChelProducer {
@@ -70,7 +71,11 @@ public class ChelProducer implements IChelProducer {
     private TicketOffice FindTheMostSuitableTicketOffice(Position position) {
 
         //EnabledOffices - всі каси, які можуть приймати клієнтів (не вимкнені) і не є резервними
-        var EnabledOffices = map.getOffices().stream().filter(o->o.getIsManaging() == true && o.getIsReserve() == false).toList();
+        var EnabledOffices = map.getOffices().stream().filter(o->o.getIsManaging() == true
+                && o.getIsReserve() == false && o.getQueue().size() < 6).toList();
+        if(EnabledOffices.size() == 0){
+            System.out.println("Немає вільних кас а нового чувака додають.");
+        }
         var mostSuitableOffice = EnabledOffices.get(0);
         var shortestQueueSize = EnabledOffices.get(0).getQueue().size();
         var counter = 0;
